@@ -35,7 +35,7 @@ class MainWindow(QWidget):
       
    def generateGraph(self, fileName, numNodes, requestedDegree):
 
-      #TODO: build the graph
+      # build the graph
       # List of (node index, adjacency list) 
       # Add the node indices in the list
       # Pick two nodes randomly from the list.
@@ -50,42 +50,42 @@ class MainWindow(QWidget):
          print("v ", v)
          vertList.append(vertexDesc(v))
 
-      #START HERE: Add the edges by adding nodes to the lists in vertDesc objects in the vertlist list
+      #Add the edges by adding nodes to the lists in vertDesc objects in the vertlist list
       
       generatedGraph = []
-      edgeCanBeAdded = true
       
-      
-      while edgeCanBeAdded and len(vertList)>0:
-         
-         numVertices = len(vertList)
-         edgeCanBeAdded = False
+      while len(vertList)>0:
+                  
          #if there are more vertices left in the list than the degree of this vertex + 1 and we haven't reached the degree
-         while (len(vertList[0].vertexNeighbors)+1 < numVertices) and (len(vertList[0].vertexNeighbors) < requestedDegree):
-            edgeCanBeAdded = True
+         while (len(vertList[0].vertexNeighbors)+1 < len(vertList)) and (len(vertList[0].vertexNeighbors) < requestedDegree):
             #get a random vertex index
             #add an edge between this and other vertex if no edge exists between them.  
             #if yes, choose another until we find one.            
             while True:
                vertexIndex = random.randint(1, len(vertList)-1)
                if not vertList[vertexIndex].vertexId in vertList[0].vertexNeighbors:
-                  vertList[0].append(vertList[vertexIndex].vertexId)
-                  #NEXT: REMOVE THE NEIGHBOR FROM THE LIST IF REACHED DEGREE AND PUT IN GRAPH.
+                  vertList[0].vertexNeighbors.append(vertList[vertexIndex].vertexId)
+                  vertList[vertexIndex].vertexNeighbors.append(vertList[0].vertexId)
+                  #REMOVE THE NEIGHBOR FROM THE LIST IF REACHED DEGREE AND PUT IN GRAPH.
+                  if len(vertList[vertexIndex].vertexNeighbors) == requestedDegree:
+                     generatedGraph.append(vertList[vertexIndex])
+                     vertList.pop(vertexIndex)
                   break
 
-         #NEXT: Remove vertex 0 from the list.  
+         #Remove vertex 0 from the list:
          #if not reached the max degree and degree is max relative to remaining list length then
          #randomly choose if connected to some random vertex in the graph.
-         #THEN put the vertex in the graph.
+         if len(vertList[0].vertexNeighbors) < requestedDegree:
+            if random.randint(0, 1) == 0:
+               #select random vertex in the other graph then add this!!!!
+               graphVertexIndex = random.randint(0, len(generatedGraph)-1)
+               vertList[0].vertexNeighbors.append(generatedGraph[graphVertexIndex].vertexId)
+               generatedGraph[graphVertexIndex].vertexNeighbors.append(vertList[0].vertexId)
+               vertList.pop(0)
          
-         #if nothing changed then
-         if not edgeCanBeAdded:
-            #for each remaining vertex
-               #if degree is 0, connect to a random vertex in other list
-               #otherwise, randomly choose to connect to a random vertex in the other tree
-         
+                          
       
-      #TODO: take the processed list 
+      #!!!NEXT: TODO: take the processed list 
       graphfile  = open(fileName, "w") 
       
       graphfile.write("p edge " + str(numNodes) + " " + "???\n")  #TODO I don't know the number of edges yet.
