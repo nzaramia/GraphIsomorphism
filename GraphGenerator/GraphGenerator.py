@@ -9,6 +9,7 @@ import random
 #Setup the UI
 #TODO: random will have to be seeded so I could reproduce issues.
 #Generate isomorphisms
+#Calculate the average degrees of the vertices
 
 class vertexDesc:
    def __init__(self, vertexId):
@@ -64,15 +65,23 @@ class MainWindow(QWidget):
       generatedGraph = []
       graphEdgeList = []
       
+      maxNeighborFindTries = 0
+      numVertices = len(vertList)
       
-      while len(vertList)>0:
+      while numVertices>0:
+         
+         maxNeighborFindTries = 2*numVertices
                   
          #if there are more vertices left in the list than the degree of this vertex + 1 and we haven't reached the degree
          while (len(vertList[0].vertexNeighbors) < requestedDegree):
+
+            numTries = 0
+
             #get a random vertex index
             #add an edge between this and other vertex if no edge exists between them.  
             #if yes, choose another until we find one.            
-            while True:
+            while numTries<maxNeighborFindTries and numVertices>1:
+               numTries += 1
                vertexIndex = random.randint(1, len(vertList)-1)
                if not vertList[vertexIndex].vertexId in vertList[0].vertexNeighbors:
                   vertList[0].vertexNeighbors.append(vertList[vertexIndex].vertexId)
@@ -84,12 +93,16 @@ class MainWindow(QWidget):
                   if len(vertList[vertexIndex].vertexNeighbors) == requestedDegree:
                      generatedGraph.append(vertList[vertexIndex])
                      vertList.pop(vertexIndex)
+                     numVertices -= 1
                   break
+
+            if numTries==maxNeighborFindTries or numVertices<=1:
+               break
 
          #Remove vertex 0 from the list:
          #if not reached the max degree and degree is max relative to remaining list length then
          #randomly choose if connected to some random vertex in the graph.
-         if len(vertList[0].vertexNeighbors) < requestedDegree:
+         if len(vertList[0].vertexNeighbors) < requestedDegree and len(generatedGraph)>0:
             if random.randint(0, 1) == 0:
                #select random vertex in the other graph then add this!!!!
                graphVertexIndex = random.randint(0, len(generatedGraph)-1)
@@ -100,6 +113,7 @@ class MainWindow(QWidget):
 
          generatedGraph.append(vertList[0])      
          vertList.pop(0)
+         numVertices -= 1
                                          
       #write the graph into a file
       graphfile  = open(fileName, "w") 
