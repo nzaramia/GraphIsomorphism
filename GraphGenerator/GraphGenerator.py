@@ -4,12 +4,13 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtCore
 
 import random
+import time
 
 #NEXT TODO:
 #Setup the UI
-#TODO: random will have to be seeded so I could reproduce issues.
 #Generate isomorphisms
 #Calculate the average degrees of the vertices
+#Test with a large number of vertices, generating and checking for isomorphisms.
 
 class vertexDesc:
    def __init__(self, vertexId):
@@ -39,7 +40,7 @@ class MainWindow(QWidget):
       #Alse, minimum degree should be 1
 
       numNodes = 10
-      Degree = 9
+      Degree = 3
       fileName = "NZ-1"
       self.generateGraph(fileName, numNodes, Degree)
       
@@ -52,6 +53,14 @@ class MainWindow(QWidget):
       # Connect them
       # If their degree >= average degree, remove it and put it in a processed list.
       # If there are nodes left at the end, connect them to a random node in the processed list.
+      
+      #Seed random and write it to a file.
+      seed = time.time()
+      #seed = 1644977001.0896435
+      random.seed(seed)
+      f = open("seed.txt", "w")
+      f.write(str(seed))
+      f.close()
       
       vertList = []
       
@@ -121,7 +130,7 @@ class MainWindow(QWidget):
       graphfile.write("p edge " + str(numNodes) + " " + str(len(graphEdgeList)) + "\n")
 
       for e in graphEdgeList:
-         graphfile.write("e " + str(e.vertexIdStart) + ' ' + str(e.vertexIdEnd) + "\n")
+         graphfile.write("e " + str(e.vertexIdStart+1) + ' ' + str(e.vertexIdEnd+1) + "\n")
       
       graphfile.close()
 
