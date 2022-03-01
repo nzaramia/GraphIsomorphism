@@ -1,15 +1,14 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QComboBox, QApplication, QPushButton
-from PyQt5.QtCore import pyqtSlot
-from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import QTextCursor, QPixmap, QFont
+from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QComboBox, QApplication, QPushButton, QTabWidget, QVBoxLayout, QTextBrowser, QHBoxLayout, QSplitter, QFrame, QFileDialog, QFormLayout, QDateTimeEdit, QCheckBox, QGridLayout, QGroupBox)
 
 import random
 import time
 
-#NEXT TODO:
-#Setup the UI
-#Generate isomorphisms
-#Calculate the average degrees of the vertices
+#NEXT 
 #Test with a large number of vertices, generating and checking for isomorphisms.
 
 class vertexDesc:
@@ -30,22 +29,107 @@ class MainWindow(QWidget):
        self.setupUI()
 
    def setupUI(self):
-      self.resize(1200, 650)
-      self.move(80, 20)
-      self.setWindowTitle('Graph Generator')
+      palette = self.palette()
+      palette.setColor(self.backgroundRole(), Qt.lightGray)
+
+      self.vertical_box_layout = QVBoxLayout(self)
+
+      self.tab_widget = QTabWidget()
+      self.console_output_browser = QTextBrowser()
+      
+
+      self.top_frame = QFrame()
+      layout = QVBoxLayout(self.top_frame)
+      layout.addWidget(self.tab_widget)
+
+      self.console_output_controls = QWidget()
+      self.console_output_controls_layout = QHBoxLayout()
+      self.console_status_text = QLabel("")
+      self.console_status_text.setFont(QFont('Arial', 12))
+
+      self.clear_console = QPushButton()
+      self.clear_console.clicked.connect(self.clear_console_browser_text)
+      self.clear_console.setText("Clear Text")
+
+      self.console_output_controls_layout.addWidget(self.console_status_text)
+      self.console_output_controls_layout.addWidget(self.clear_console)
+      self.console_output_controls.setLayout(self.console_output_controls_layout)
+
+      self.bottom_frame = QFrame()
+      layout = QVBoxLayout(self.bottom_frame)
+      layout.addWidget(self.console_output_browser)
+      layout.addWidget(self.console_output_controls)
+
+      self.top_frame.setFrameShape(QFrame.StyledPanel)
+      self.bottom_frame.setFrameShape(QFrame.StyledPanel)
+
+      self.SetupFirstTab()
+
+      self.splitter = QSplitter(QtCore.Qt.Vertical)
+      self.splitter.addWidget(self.top_frame)
+      self.splitter.addWidget(self.bottom_frame)
+      self.splitter.setSizes([100, 500])
+
+      self.vertical_box_layout.addWidget(self.splitter)
+      self.setLayout(self.vertical_box_layout)
+
+      self.setWindowTitle("Graph Generator")
+      self.setGeometry(100, 50, 800, 800)
+
+      #self.resize(1200, 650)
+      #self.move(80, 20)
+      #self.setWindowTitle('Graph Generator')
                    
-      self.show()
-      
+          
       #TODO the degree given by the user cannot be greater than #nodes-1
-      #Alse, minimum degree should be 1
+      #Also, minimum degree should be 1
 
-      numNodes = 10
-      Degree = 3
-      fileName = "NZ-1"
-      self.generateGraph(fileName, numNodes, Degree)
+   def SetupFirstTab(self):
+      self.tab1 = QWidget()
+      self.tab_widget.addTab(self.tab1, "Generate Graph")
+
+      main_layout = QFormLayout()
+      main_layout.setSpacing(20)
+      main_layout.setContentsMargins(50, 50, 200, 200)
+
+      self.numNodes = QLineEdit()
+      self.averageDegree = QLineEdit()
+      self.fileName = QLineEdit()
+
+      self.fileName.setText("NZ-1")
       
-   def generateGraph(self, fileName, numNodes, requestedDegree):
+      main_layout.addRow("Number of Nodes", self.numNodes)
+      main_layout.addRow("Average Degree", self.averageDegree)
+      main_layout.addRow("File name", self.fileName)      
 
+      self.generate_graph_button = QPushButton()
+      self.generate_graph_button.clicked.connect(self.generateGraph)
+      self.generate_graph_button.setText("Generate Graph")
+
+      self.generate_graph_button.setFixedSize(100, 40)
+      main_layout.addWidget(self.generate_graph_button)
+
+      self.tab1.setLayout(main_layout)
+
+
+   @pyqtSlot()
+   def clear_console_browser_text(self):
+      self.console_output_browser.setText("")
+      
+   def generateGraph(self):
+      self.console_output_browser.clear()
+      
+      try:
+         requestedDegree = int(self.averageDegree.text())
+         numNodes = int(self.numNodes.text())
+      except:
+         self.console_output_browser.append("You must enter a number.")
+         return
+      
+      fileName = self.fileName.text()   
+
+      self.console_output_browser.clear()
+      self.console_output_browser.append("Generating graph, please wait...")
       # build the graph
       # List of (node index, adjacency list) 
       # Add the node indices in the list
@@ -66,7 +150,7 @@ class MainWindow(QWidget):
       
       #Add the vertices
       for v in range(numNodes):
-         print("v ", v)
+         #print("v ", v)
          vertList.append(vertexDesc(v))
 
       #Add the edges by adding nodes to the lists in vertDesc objects in the vertlist list
@@ -123,7 +207,8 @@ class MainWindow(QWidget):
          generatedGraph.append(vertList[0])      
          vertList.pop(0)
          numVertices -= 1
-                                         
+
+
       #write the graph into a file
       graphfile  = open(fileName, "w") 
       
@@ -133,6 +218,38 @@ class MainWindow(QWidget):
          graphfile.write("e " + str(e.vertexIdStart+1) + ' ' + str(e.vertexIdEnd+1) + "\n")
       
       graphfile.close()
+      self.console_output_browser.append("Graph generation complete.")
+
+      #Calcualte the average degree
+      edgeCount = 0
+      for v in generatedGraph:
+         edgeCount += len(v.vertexNeighbors)
+      avgDeg = edgeCount / numNodes
+
+      self.console_output_browser.append("Average degree: " + str(avgDeg))
+
+      generateIsomorphism(generatedGraph, graphEdgeList, fileName)
+
+def generateIsomorphism(generatedGraph, graphEdgeList, fileName):
+   
+   numNodes = len(generatedGraph)
+   #create a list of node indices and shuffle them
+   nodeList = []
+
+   for i in range(numNodes):
+      nodeList.append(i)
+
+   random.shuffle(nodeList)
+   #write the graph into a file
+   graphfile  = open(fileName+"_iso", "w") 
+      
+   graphfile.write("p edge " + str(numNodes) + " " + str(len(graphEdgeList)) + "\n")
+
+   for e in graphEdgeList:
+      graphfile.write("e " + str(nodeList[e.vertexIdStart]+1) + ' ' + str(nodeList[e.vertexIdEnd]+1) + "\n")
+      
+   graphfile.close()
+
 
 
 def main():
@@ -140,7 +257,7 @@ def main():
     app = QApplication(sys.argv)
     
     ex = MainWindow()
-    #w.show()
+    ex.show()
     
     sys.exit(app.exec_())
 
