@@ -1,0 +1,1 @@
+call python iso.py

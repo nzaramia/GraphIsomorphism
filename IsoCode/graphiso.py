@@ -2,6 +2,8 @@ import graph
 import isotree
 import time
 
+from difflib import SequenceMatcher
+
 ######################################################################################################
 
 class GraphIso:  
@@ -785,6 +787,7 @@ class GraphIso:
 
        print("Number of tree comparisons:", checkCount)
        stop = True
+       i
        
        return numIso, doTreesMatch, t1.treeHeight
 

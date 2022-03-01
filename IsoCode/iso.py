@@ -17,10 +17,14 @@ def singleGraphIso():
     g1_DegreeOccurenceIndices = [[]]
     g2_DegreeOccurenceIndices = [[]]
     
-   
-    g1, g1_DegreeOccurenceIndices  = dbreader.read_mz_Graph(r"\GraphDB\had\had\had\had-4", isConnectedA)
-    g2, g2_DegreeOccurenceIndices  = dbreader.read_mz_Graph(r"\GraphDB\had\had\had\had-4", isConnectedB)
+    #g1, g1_DegreeOccurenceIndices  = dbreader.readGraph(r"C:\Temp\Nancy\SVNRepos\Home\Trunk\MyData\GraphDB\graphsdb\graphsdb\iso_m2D\iso\m2D\m2D\16\iso_m2D_s16.A96", isConnectedA)
+    #g2, g2_DegreeOccurenceIndices  = dbreader.readGraph(r"C:\Temp\Nancy\SVNRepos\Home\Trunk\MyData\GraphDB\graphsdb\graphsdb\iso_m2D\iso\m2D\m2D\16\iso_m2D_s16.B96", isConnectedB)
     
+    #g1, g1_DegreeOccurenceIndices  = dbreader.read_mz_Graph(r"C:\Temp\Nancy\SVNRepos\Home\Trunk\MyData\GraphDB\nz\nz-1", isConnectedA)
+    #g2, g2_DegreeOccurenceIndices  = dbreader.read_mz_Graph(r"C:\Temp\Nancy\SVNRepos\Home\Trunk\MyData\GraphDB\nz\nz-1", isConnectedB)
+    
+    g1, g1_DegreeOccurenceIndices  = dbreader.read_mz_Graph(r"C:\Temp\Nancy\SVNRepos\Home\Trunk\MyData\IsoPaper\TenthDraft\GraphGenerator\nz-1", isConnectedA)
+    g2, g2_DegreeOccurenceIndices  = dbreader.read_mz_Graph(r"C:\Temp\Nancy\SVNRepos\Home\Trunk\MyData\IsoPaper\TenthDraft\GraphGenerator\nz-1_iso", isConnectedB)
            
     print("****Start G1 dfs****")
     g1.dfs_connected_component()
@@ -100,7 +104,7 @@ def multipleGraphIso(partialdirname, subdirname, vsize, GraphIndex):
     g2_DegreeOccurenceIndices = [[]]   
 
     
-    dir_name = r"\GraphDB\graphsdb\graphsdb\iso_"+ sub_dir_name + "\iso\\" + partial_dir_name + "\\"
+    dir_name = r"C:\Temp\Nancy\SVNRepos\Home\Trunk\MyData\GraphDB\graphsdb\graphsdb\iso_"+ sub_dir_name + "\iso\\" + partial_dir_name + "\\"
     dbreader.getGraphFileNames(dir_name +sub_dir_name + "\\"+ v_size, graphFileNamesA, graphFileNamesB)    
     
     print(dir_name)
@@ -199,12 +203,12 @@ def multipleGraphIso(partialdirname, subdirname, vsize, GraphIndex):
     
     
 #Main    
-#singleGraphIso()
+singleGraphIso()
 
-partialdirname = "m3D"
-subdirname = ""
-startIndex = 0
-vsizes = ["125"]
+#partialdirname = "m3D"
+#subdirname = ""
+#startIndex = 0
+#vsizes = ["125"]
 
-for vs in vsizes:
-   multipleGraphIso(partialdirname, subdirname, vs, startIndex)
+#for vs in vsizes:
+#   multipleGraphIso(partialdirname, subdirname, vs, startIndex)
