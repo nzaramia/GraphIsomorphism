@@ -1,9 +1,8 @@
-# Heading
-Graph Isomorphism Using a Tree-mapping Approach
+# Graph Isomorphism Using a Tree-mapping Approach
 
-Nancy Zaramian
-January 29, 2022
-Abstract
+<h2>Nancy Zaramian</h2>
+<h2>January 29, 2022</h2>
+<h2>Abstract</h2>
 The graph isomorphism problem asks whether two graphs are essen-
 tially the same. Researchers have been looking for a polynomial-time
 solution for it for many decades. This paper provides an algorithm for
