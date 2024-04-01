@@ -1,4 +1,4 @@
-<h2> Graph Isomorphism Using a Tree-mapping Approach </h2>
+<h2 align=center> Graph Isomorphism Using a Tree-mapping Approach </h2 align=center>
 
 <h3 align=center>Nancy Zaramian</h3>
 <h3 align=center>January 29, 2022</h3>
